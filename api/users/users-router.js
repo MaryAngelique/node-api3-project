@@ -17,19 +17,26 @@ router.get('/', (req, res, next) => {
 });
 
 router.get('/:id', validateUserId, (req, res) => {
-  // RETURN THE USER OBJECT
-  // this needs a middleware to verify user id
+  res.json(req.user);
 });
 
-router.post('/', (req, res) => {
-  // RETURN THE NEWLY CREATED USER OBJECT
-  // this needs a middleware to check that the request body is valid
+router.post('/', validateUser, (req, res, next) => {
+  User.insert( { name: req.name } )
+    .then(newUser => {
+      res.status(201).json(newUser)
+
+    }).catch(next)
 });
 
-router.put('/:id', validateUserId, (req, res) => {
-  // RETURN THE FRESHLY UPDATED USER OBJECT
-  // this needs a middleware to verify user id
-  // and another middleware to check that the request body is valid
+router.put('/:id', validateUserId, validateUser, (req, res, next) => {
+  User.update(req.params.is, { name: req.name })
+    .then(updatedUser => {
+      res.json(updatedUser)
+
+    }) .then(user => {
+      res.json(user)
+
+    }).catch(next)
 });
 
 router.delete('/:id',  validateUserId, (req, res) => {
@@ -49,11 +56,5 @@ router.post('/:id/posts', validateUserId, (req, res) => {
   // and another middleware to check that the request body is valid
 });
 
-router.use((error, req, res, next) => {
-  res.status(error.status || 500).json( { customMessage: "Router not working",
-    message: error.message,
-    stack: error.stack,
- } )
-})
 
 // do not forget to export the router
