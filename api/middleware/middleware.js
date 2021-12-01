@@ -6,7 +6,19 @@ function logger(req, res, next) {
 }
 
 function validateUserId(req, res, next) {
-  // DO YOUR MAGIC
+  const { id } = req.params;
+  User.getById(id)
+    .then(users => {
+
+      if(users) {
+        req.user = users;
+        next();
+
+      } else {
+        res.status(404).json( { message: "user not found" } )
+      }
+
+    }).catch(next);
 }
 
 function validateUser(req, res, next) {
