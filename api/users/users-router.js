@@ -20,41 +20,67 @@ router.get('/:id', validateUserId, (req, res) => {
   res.json(req.user);
 });
 
-router.post('/', validateUser, (req, res, next) => {
-  User.insert( { name: req.name } )
+router.post('/', validateUser, (req, res) => {
+  User.insert(req.body)
     .then(newUser => {
-      res.status(201).json(newUser)
-
-    }).catch(next)
+      res.status(200).json(newUser);
+    })
+    .catch(err => {
+      console.log(err);
+      res.status(500).json({message: 'There was an error adding the user'});
+    });
 });
 
-router.put('/:id', validateUserId, validateUser, (req, res, next) => {
-  User.update(req.params.is, { name: req.name })
+router.put('/:id', validateUserId, validateUser, (req, res) => {
+  User.update(req.params.id, req.body)
     .then(updatedUser => {
-      res.json(updatedUser)
-
-    }) .then(user => {
-      res.json(user)
-
-    }).catch(next)
+      res.status(200).json(updatedUser);
+    })
+    .catch(err => {
+      console.log(err);
+      res.status(500).json({message: 'There was an error updating the user'});
+    });
 });
 
-router.delete('/:id',  validateUserId, (req, res) => {
-  // RETURN THE FRESHLY DELETED USER OBJECT
-  // this needs a middleware to verify user id
+router.delete('/:id',  validateUserId, async (req, res, next) => {
+  try{
+    await User.remove(req.params.id)
+    res.json(req.user)
+
+  } catch (error) {
+    next(error);
+  }
 
 });
 
-router.get('/:id/posts', validateUserId, (req, res) => {
-  // RETURN THE ARRAY OF USER POSTS
-  // this needs a middleware to verify user id
+router.get('/:id/posts', validateUserId, async (req, res, next) => {
+  try{
+    const result = await User.getUserPosts(req.params.id)
+    res.json(result)
+
+  } catch (error) {
+    next(error);
+  }
 });
 
-router.post('/:id/posts', validateUserId, (req, res) => {
-  // RETURN THE NEWLY CREATED USER POST
-  // this needs a middleware to verify user id
-  // and another middleware to check that the request body is valid
+router.post('/:id/posts', validateUserId, validatePost, (req, res) => {
+  req.body.user_id = req.params.id; 
+  Post.insert(req.body)
+    .then(newPost => {
+      res.status(200).json(newPost);
+    })
+    .catch(err => {
+      console.log(err);
+      res.status(500).json({message: 'There was an error adding the post'});
+    });
 });
 
+// router.use((error, req, res, next) => {
+//   res.status(error.status || 500).json( { customMessage: "Router not working",
+//     message: error.message,
+//     stack: error.stack,
+//  } )
+// })
 
 // do not forget to export the router
+module.exports = router;
