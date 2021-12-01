@@ -28,10 +28,10 @@ Your assignment page on Canvas should contain instructions for submitting this p
   [x] if the `id` parameter is valid, store the user object as `req.user` and allow the request to continue
   [x] if the `id` parameter does not match any user id in the database, respond with status `404` and `{ message: "user not found" }`
 
-- `validateUser()`
+[x] `validateUser()`
 
-  - `validateUser` validates the `body` on a request to create or update a user
-  - if the request `body` lacks the required `name` field, respond with status `400` and `{ message: "missing required name field" }`
+  [x] `validateUser` validates the `body` on a request to create or update a user
+  [x] if the request `body` lacks the required `name` field, respond with status `400` and `{ message: "missing required name field" }`
 
 - `validatePost()`
 
